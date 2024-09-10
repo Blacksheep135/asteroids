@@ -1,6 +1,6 @@
 import pygame
 from constants import *
-from player import *
+import player
 
 def main():
     pygame.init()
@@ -10,23 +10,33 @@ def main():
     x = SCREEN_WIDTH / 2
     y = SCREEN_HEIGHT / 2
 
-    pl = player(x, y)
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
+
     dt = 0
+    pl = player.player(x, y)
+    
+    player.containers = (updatable, drawable)
 
     print("Starting asteroids!")
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
-
+    
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
             
-        player.update(dt)
+        for obj in updatable:
+            obj.update(dt)
+            
         screen.fill("black")
-        pl.draw(screen)
+        
+        for obj in drawable:
+            obj.draw(screen)
+
         pygame.display.flip()
 
 
