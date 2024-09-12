@@ -1,28 +1,37 @@
+import sys
 import pygame
 from constants import *
-import player
+from player import *
+from asteroid import *
+from asteroidfield import AsteroidField
+from circleshape import *
+from Shot import *
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
-    x = SCREEN_WIDTH / 2
-    y = SCREEN_HEIGHT / 2
-
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
+    asteroid = pygame.sprite.Group()
+    Shot = pygame.sprite.Group()
 
+    x = SCREEN_WIDTH / 2
+    y = SCREEN_HEIGHT / 2
     dt = 0
-    pl = player.player(x, y)
     
+    shot.containers = (Shot, updatable, drawable)
     player.containers = (updatable, drawable)
+    Asteroid.containers = (asteroid, updatable, drawable)
+    AsteroidField.containers = updatable
+    asteroid_field = AsteroidField()
+
+    pl = player(x, y)
 
     print("Starting asteroids!")
     print(f"Screen width: {SCREEN_WIDTH}")
-    print(f"Screen height: {SCREEN_HEIGHT}")
-
-    
+    print(f"Screen height: {SCREEN_HEIGHT}")    
 
     while True:
         for event in pygame.event.get():
@@ -31,6 +40,15 @@ def main():
             
         for obj in updatable:
             obj.update(dt)
+
+        for obj in asteroid:
+            for b in Shot:
+                if b.check_collision(obj):
+                    b.kill()
+                    obj.split()
+            if obj.check_collision(pl):
+                print("Game over!")
+                sys.exit()
             
         screen.fill("black")
         
@@ -38,7 +56,6 @@ def main():
             obj.draw(screen)
 
         pygame.display.flip()
-
 
         # limit the framerate to 60 FPS
         dt = clock.tick(60) / 1000
